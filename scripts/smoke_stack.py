@@ -43,7 +43,13 @@ def main():
     assert groups["total"] > 0, "Seeded groups were not discoverable"
     events = request(f"{API}/api/events")
     assert events["total"] > 0, "Seeded events were not discoverable"
-    assert request(f"{API}/api/matches"), "Seeded example connections were not returned"
+    matches = request(f"{API}/api/matches")
+    assert matches, "Seeded example connections were not returned"
+    request(f"{API}/api/organizations/{groups['organizations'][0]['node_id']}")
+    request(f"{API}/api/events/{events['events'][0]['node_id']}")
+    request(f"{API}/api/matches/{matches[0]['match_id']}")
+    for path in ["/api/profile", "/api/trust/graph", "/api/messages", "/api/signals"]:
+        request(API + path)
     print("PASS: local email login, persisted session, graph discovery, and seeded connections")
 
 
