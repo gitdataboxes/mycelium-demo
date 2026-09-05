@@ -1,5 +1,11 @@
 # Verification
 
+## Recorded results
+
+Validated on 2026-09-04 (Pacific time) with Node 22, Python 3.12, and PostgreSQL 16 in GitHub Actions: **120 backend tests passed**, **4 preview behavior tests passed**, both frontend build modes passed, and the fresh Compose stack started and accepted the synthetic seed. The seed created 15 fictional members, 5 organizations, 8 events, and 25 messages.
+
+Manual browser checks also verified profile edits, organization filtering, and organization details in the no-account preview. This is functional verification, not a production or relevance benchmark.
+
 ## Frontend
 
 Use Node.js 22.18+ with the committed npm lockfile:
