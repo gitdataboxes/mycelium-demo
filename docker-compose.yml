@@ -1,0 +1,57 @@
+name: mycelium-demo
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: mycelium
+      POSTGRES_PASSWORD: mycelium_demo
+      POSTGRES_DB: mycelium
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mycelium"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+  mail:
+    image: axllent/mailpit:v1.29
+    ports:
+      - "127.0.0.1:8025:8025"
+  backend:
+    build: ./backend
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://mycelium:mycelium_demo@db:5432/mycelium
+      BASE_URL: http://localhost:3000
+      CORS_ORIGINS: http://localhost:3000
+      SMTP_HOST: mail
+      SMTP_PORT: 1025
+      SMTP_FROM_EMAIL: demo@example.com
+      VOYAGE_API_KEY: ${VOYAGE_API_KEY:-}
+    volumes:
+      - ./seed_synthetic.py:/app/seed_synthetic.py:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      mail:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+volumes:
+  pgdata:

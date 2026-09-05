@@ -1,0 +1,29 @@
+# Local state and credentials
+.env
+.env.*
+!.env.example
+.venv/
+.venv*/
+__pycache__/
+*.pyc
+*.log
+*.sqlite*
+*.db
+.pid*
+.claude/
+.codex/
+.agents/
+# Dependencies and generated artifacts
+node_modules/
+.next/
+dist/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+*.tsbuildinfo
+test-results/
+playwright-report/
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
