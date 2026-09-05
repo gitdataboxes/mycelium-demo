@@ -33,3 +33,5 @@ Create `mycelium_test` and enable `CREATE EXTENSION IF NOT EXISTS vector` before
 CI applies `alembic upgrade head` against a separate fresh database, runs `seed_synthetic.py` twice to exercise its populated-database guard, and builds both container images. The documented Compose path includes Mailpit so magic-link login needs no external SMTP account.
 
 Automated service tests and seeded scores do not establish production scale, real embedding quality, or end-user outcomes. The database-backed demo must remain local until development admin routes and deployment policy are hardened.
+
+The container check also runs `python3 scripts/smoke_stack.py`: it requests a login email in the local Mailpit inbox, exchanges its token for a session, and verifies authenticated organization/event discovery and seeded connections. This sends no external email.

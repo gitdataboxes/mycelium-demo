@@ -70,6 +70,8 @@ jobs:
       - name: Build and start local stack
         run: docker compose up --build -d --wait --wait-timeout 180
       - run: docker compose exec -T backend python seed_synthetic.py
+      - name: Exercise local email login and seeded discovery
+        run: python3 scripts/smoke_stack.py
       - name: Check frontend and API
         run: |
           curl --fail http://localhost:3000
