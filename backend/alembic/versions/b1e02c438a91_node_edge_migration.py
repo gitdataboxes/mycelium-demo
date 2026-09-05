@@ -8,6 +8,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 import pgvector.sqlalchemy.vector
 
 
@@ -57,7 +58,7 @@ def upgrade() -> None:
     op.create_table('nodes',
         sa.Column('id', sa.UUID(), nullable=False, server_default=sa.text('gen_random_uuid()')),
         sa.Column('community_id', sa.UUID(), nullable=False),
-        sa.Column('type', sa.Enum('user', 'organization', 'event', name='node_type', create_type=False), nullable=False),
+        sa.Column('type', postgresql.ENUM('user', 'organization', 'event', name='node_type', create_type=False), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.ForeignKeyConstraint(['community_id'], ['communities.id']),
@@ -147,7 +148,7 @@ def upgrade() -> None:
         sa.Column('id', sa.UUID(), nullable=False, server_default=sa.text('gen_random_uuid()')),
         sa.Column('source_node_id', sa.UUID(), nullable=False),
         sa.Column('target_node_id', sa.UUID(), nullable=False),
-        sa.Column('type', sa.Enum('vouch', 'cool', 'block', 'report', 'member', 'participant', 'host', name='edge_type', create_type=False), nullable=False),
+        sa.Column('type', postgresql.ENUM('vouch', 'cool', 'block', 'report', 'member', 'participant', 'host', name='edge_type', create_type=False), nullable=False),
         sa.Column('context_node_id', sa.UUID(), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
@@ -209,7 +210,7 @@ def upgrade() -> None:
         sa.Column('location', sa.Text(), nullable=True),
         sa.Column('starts_at', sa.DateTime(timezone=True), nullable=True),
         sa.Column('ends_at', sa.DateTime(timezone=True), nullable=True),
-        sa.Column('urgency', sa.Enum('standard', 'spontaneous', name='event_urgency', create_type=False), nullable=False, server_default='standard'),
+        sa.Column('urgency', postgresql.ENUM('standard', 'spontaneous', name='event_urgency', create_type=False), nullable=False, server_default='standard'),
         sa.ForeignKeyConstraint(['node_id'], ['nodes.id']),
         sa.PrimaryKeyConstraint('node_id')
     )

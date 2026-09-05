@@ -57,8 +57,8 @@ async def discover(
     sql = f"""
     WITH RECURSIVE trust_reach AS (
         -- Seed: the requesting user at depth 0
-        SELECT :user_id::uuid AS node_id, 0 AS depth,
-               ARRAY[:user_id::uuid] AS path
+        SELECT CAST(:user_id AS uuid) AS node_id, 0 AS depth,
+               ARRAY[CAST(:user_id AS uuid)] AS path
         UNION ALL
         -- Walk vouch edges bidirectionally (vouching is mutual)
         SELECT

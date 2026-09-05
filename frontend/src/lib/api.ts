@@ -193,6 +193,10 @@ let mockMessages: MessageInfo[] = [
   { id: "msg-1", from_node_id: "dev-node-001", from_username: "alice", to_node_id: "dev-node-002", to_username: "bob", context_node_id: "evt-001", context_name: "Park Cleanup Day", content: "Hey, I'd love to help out with the cleanup!", created_at: new Date(Date.now() - 3600000).toISOString(), read_at: null },
   { id: "msg-2", from_node_id: "dev-node-002", from_username: "bob", to_node_id: "dev-node-001", to_username: "alice", context_node_id: "evt-001", context_name: "Park Cleanup Day", content: "Great! We could use help with the south trail area.", created_at: new Date(Date.now() - 1800000).toISOString(), read_at: null },
 ];
+const mockMatches: MatchListItem[] = [
+  { match_id: "m1", other_username: "bob", own_content: "Python mentoring", own_direction: "output", other_content: "Learn Python for data science", other_direction: "input", similarity: 0.87, matched_at: new Date().toISOString() },
+  { match_id: "m2", other_username: "carol", own_content: "Garden plot sharing", own_direction: "input", other_content: "Have extra garden space this summer", other_direction: "output", similarity: 0.82, matched_at: new Date().toISOString() },
+];
 let mockIdCounter = 10;
 
 function getMockProfile(): Profile {
@@ -269,19 +273,28 @@ export const api = DEV_MOCK
         remove: async (id: string) => { mockSignals = mockSignals.filter((s) => s.id !== id); },
       },
       matches: {
-        list: async (): Promise<MatchListItem[]> => [
-          { match_id: "m1", other_username: "bob", own_content: "Python mentoring", own_direction: "output", other_content: "Learn Python for data science", other_direction: "input", similarity: 0.87, matched_at: new Date().toISOString() },
-          { match_id: "m2", other_username: "carol", own_content: "Garden plot sharing", own_direction: "input", other_content: "Have extra garden space this summer", other_direction: "output", similarity: 0.82, matched_at: new Date().toISOString() },
-        ],
-        getDetail: async (matchId: string): Promise<MatchDetail> => ({
-          match_id: matchId, similarity: 0.87, matched_at: new Date().toISOString(),
-          node_a: { node_id: "dev-node-001", username: "alice", attribute_content: "Python mentoring", attribute_direction: "output", attribute_type: "membrane" },
-          node_b: { node_id: "dev-node-002", username: "bob", attribute_content: "Learn Python for data science", attribute_direction: "input", attribute_type: "membrane" },
-        }),
+        list: async (): Promise<MatchListItem[]> => [...mockMatches],
+        getDetail: async (matchId: string): Promise<MatchDetail> => {
+          const match = mockMatches.find(item => item.match_id === matchId);
+          if (!match) throw new Error("Connection not found");
+          return {
+            match_id: match.match_id, similarity: match.similarity, matched_at: match.matched_at,
+            node_a: { node_id: "dev-node-001", username: "alice", attribute_content: match.own_content, attribute_direction: match.own_direction, attribute_type: "membrane" },
+            node_b: { node_id: match.other_username === "bob" ? "dev-node-002" : "dev-node-003", username: match.other_username, attribute_content: match.other_content, attribute_direction: match.other_direction, attribute_type: "membrane" },
+          };
+        },
       },
       organizations: {
-        list: async (_search?: string): Promise<OrgListResponse> => ({ organizations: [...mockOrgs], total: mockOrgs.length }),
-        get: async (nodeId: string): Promise<OrgInfo> => mockOrgs.find(o => o.node_id === nodeId) || mockOrgs[0],
+        list: async (search?: string): Promise<OrgListResponse> => {
+          const query = search?.trim().toLowerCase() || "";
+          const organizations = mockOrgs.filter(org => `${org.name} ${org.description || ""}`.toLowerCase().includes(query));
+          return { organizations, total: organizations.length };
+        },
+        get: async (nodeId: string): Promise<OrgInfo> => {
+          const org = mockOrgs.find(item => item.node_id === nodeId);
+          if (!org) throw new Error("Organization not found");
+          return org;
+        },
         create: async (name: string, description?: string): Promise<OrgInfo> => {
           const org: OrgInfo = { node_id: `org-${++mockIdCounter}`, name, description: description || null, created_at: new Date().toISOString(), member_count: 1, is_member: true, graph_distance: 0, inputs: [], outputs: [] };
           mockOrgs.push(org);
@@ -320,8 +333,18 @@ export const api = DEV_MOCK
         removeResponder: async (_nodeId: string, _responderNodeId: string) => {},
       },
       events: {
-        list: async (_search?: string, _upcoming?: boolean): Promise<EventListResponse> => ({ events: [...mockEvents], total: mockEvents.length }),
-        get: async (nodeId: string): Promise<EventInfo> => mockEvents.find(e => e.node_id === nodeId) || mockEvents[0],
+        list: async (search?: string, upcoming?: boolean): Promise<EventListResponse> => {
+          const query = search?.trim().toLowerCase() || "";
+          const events = mockEvents.filter(event =>
+            `${event.title} ${event.description || ""}`.toLowerCase().includes(query) &&
+            (!upcoming || !event.ends_at || new Date(event.ends_at).getTime() > Date.now()));
+          return { events, total: events.length };
+        },
+        get: async (nodeId: string): Promise<EventInfo> => {
+          const event = mockEvents.find(item => item.node_id === nodeId);
+          if (!event) throw new Error("Event not found");
+          return event;
+        },
         create: async (data: { title: string; description?: string; location?: string; starts_at?: string; ends_at?: string; urgency?: string }): Promise<EventInfo> => {
           const evt: EventInfo = { node_id: `evt-${++mockIdCounter}`, title: data.title, description: data.description || null, location: data.location || null, starts_at: data.starts_at || null, ends_at: data.ends_at || null, urgency: (data.urgency as "standard" | "spontaneous") || "standard", created_at: new Date().toISOString(), participant_count: 1, is_participant: true, graph_distance: 0, inputs: [], outputs: [] };
           mockEvents.push(evt);

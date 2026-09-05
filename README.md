@@ -8,9 +8,11 @@ A full-stack prototype for connecting people, community groups, and events throu
 
 A neighbor offers bike repair. A community event needs a repair volunteer. Mycelium represents both as nodes with offers and needs, supports semantic matching, and uses relationship proximity to make discovery more relevant. First contact can happen through a group or event before becoming a direct conversation.
 
+![Mycelium sample community overview](docs/preview.png)
+
 ## Try the no-account preview
 
-Requires Node.js 20.9+ and npm. No API keys, database, or email account are needed.
+Requires Node.js 22.18+ and npm. No API keys, database, or email account are needed.
 
 ```bash
 git clone https://github.com/gitdataboxes/mycelium-demo.git
@@ -81,6 +83,7 @@ flowchart TD
 ```bash
 cd frontend
 npm ci
+npm test
 npm run typecheck
 npm run build:demo
 ```

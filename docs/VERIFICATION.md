@@ -2,11 +2,12 @@
 
 ## Frontend
 
-Use Node.js 20.9+ with the committed npm lockfile:
+Use Node.js 22.18+ with the committed npm lockfile:
 
 ```bash
 cd frontend
 npm ci
+npm test
 npm run typecheck
 npm run build:demo
 npm run demo
