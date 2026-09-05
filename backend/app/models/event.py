@@ -26,7 +26,7 @@ class Event(Base):
     starts_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     ends_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     urgency: Mapped[EventUrgency] = mapped_column(
-        Enum(EventUrgency, name="event_urgency"), nullable=False, default=EventUrgency.STANDARD
+        Enum(EventUrgency, values_callable=lambda members: [member.value for member in members], name="event_urgency"), nullable=False, default=EventUrgency.STANDARD
     )
 
     node: Mapped["Node"] = relationship()

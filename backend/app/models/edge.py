@@ -30,7 +30,7 @@ class Edge(Base):
     target_node_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("nodes.id"), nullable=False
     )
-    type: Mapped[EdgeType] = mapped_column(Enum(EdgeType, name="edge_type"), nullable=False)
+    type: Mapped[EdgeType] = mapped_column(Enum(EdgeType, values_callable=lambda members: [member.value for member in members], name="edge_type"), nullable=False)
     context_node_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("nodes.id"), nullable=True
     )

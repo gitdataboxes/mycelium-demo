@@ -21,7 +21,7 @@ class MembraneEntry(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     node_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("nodes.id"))
     direction: Mapped[AttributeDirection] = mapped_column(
-        Enum(AttributeDirection, name="attribute_direction"), nullable=False
+        Enum(AttributeDirection, values_callable=lambda members: [member.value for member in members], name="attribute_direction"), nullable=False
     )
     content: Mapped[str] = mapped_column(Text, nullable=False)
     embedding: Mapped[list[float] | None] = mapped_column(Vector(1024), nullable=True)

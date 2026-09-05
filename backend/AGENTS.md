@@ -104,11 +104,12 @@ APScheduler instance lives in `scheduler.py` (shared module). Jobs are registere
 
 ## Migrations
 
-Alembic in `backend/alembic/`. Four migrations exist:
+Alembic in `backend/alembic/`. Five migrations exist:
 1. `a0f05b925247` — initial user-centric schema
 2. `b1e02c438a91` — node/edge migration
 3. `c3f14d567890` — messaging context + responder edge type
-4. `d4e25f678901` — graph analytics cache table (current)
+4. `d4e25f678901` — graph analytics cache table
+5. `e5f36a789012` — normalize attribute direction values (current)
 
 Run with: `alembic upgrade head` (from `backend/` directory)
 
