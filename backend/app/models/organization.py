@@ -16,4 +16,4 @@ class Organization(Base):
     name: Mapped[str] = mapped_column(Text, nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    node: Mapped["Node"] = relationship()
+    node: Mapped["Node"] = relationship(lazy="joined")

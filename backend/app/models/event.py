@@ -29,4 +29,4 @@ class Event(Base):
         Enum(EventUrgency, values_callable=lambda members: [member.value for member in members], name="event_urgency"), nullable=False, default=EventUrgency.STANDARD
     )
 
-    node: Mapped["Node"] = relationship()
+    node: Mapped["Node"] = relationship(lazy="joined")
